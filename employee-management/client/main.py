@@ -106,4 +106,4 @@ async def delete_chat_history():
             raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="107.109.54.27", port=5000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)

@@ -1,3 +1,4 @@
+import os
 from typing import Any, List
 import random
 import httpx
@@ -6,20 +7,23 @@ import weaviate
 from weaviate.util import generate_uuid5
 from weaviate.classes.query import Filter
 from datetime import datetime 
+
 food_class_name = "Foods"
 user_class  = "EmployeeWallet"
 ordered_foods = "Orders"
-# Initialize FastMCP server
+
+WEAVIATE_HOST = os.getenv("WEAVIATE_HOST", "localhost")
+WEAVIATE_PORT = int(os.getenv("WEAVIATE_PORT", "8080"))
+APP_BASE_URL = os.getenv("APP_URL", "http://localhost:8000")
+
 mcp = FastMCP(name ="application_tools",
 host ="0.0.0.0",
 port = 8123)
 
-
-
-application_url_exact_search ="http://0.0.0.0:8000/exact_search"
-application_url_semantic_search ="http://0.0.0.0:8000/semantic_search/"
-application_url_food_details = "http://0.0.0.0:8000/food_details/"
-application_url_restaurant_details = "http://0.0.0.0:8000/restaurant_details/"
+application_url_exact_search = f"{APP_BASE_URL}/exact_search"
+application_url_semantic_search = f"{APP_BASE_URL}/semantic_search/"
+application_url_food_details = f"{APP_BASE_URL}/food_details/"
+application_url_restaurant_details = f"{APP_BASE_URL}/restaurant_details/"
 
 
 
@@ -210,8 +214,8 @@ async def place_order_with_food_id(user_id: int, food_id: str):
     
     try:
         client = weaviate.connect_to_local(
-            host="localhost",
-            port=8080,
+            host=WEAVIATE_HOST,
+            port=WEAVIATE_PORT,
             grpc_port=50051,
         )
         food_uuid = generate_uuid5(food_id)

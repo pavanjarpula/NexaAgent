@@ -1,5 +1,6 @@
+import os
 import pandas as pd
-import httpx  # Changed from requests to httpx for async support
+import httpx
 from fastapi import FastAPI, HTTPException ,Request
 import weaviate
 import json
@@ -7,25 +8,20 @@ import logging
 import ast
 import uuid
 from weaviate.classes.query import Filter
-# Set up logger
 logger = logging.getLogger(__name__)
 
-WEAVIATE_URL = "http://0.0.0.0:8080"
-CSV_PATH = "indian_restaurants_with_detailed_summaries.csv"
-NOMIC_API_URL = "http://localhost:11434/api/embeddings"
+WEAVIATE_HOST = os.getenv("WEAVIATE_HOST", "localhost")
+WEAVIATE_PORT = int(os.getenv("WEAVIATE_PORT", "8080"))
+NOMIC_API_URL = os.getenv("NOMIC_API_URL", "http://localhost:11434/api/embeddings")
 EMBEDDING_MODEL = "nomic-embed-text"
-# class_name = "DelhiRestaurant"
-# class_name ="IndianRestaurant"
-# class_name = "FoodItems"
-# class_name = "Users"
+CSV_PATH = "indian_restaurants_with_detailed_summaries.csv"
 class_name = "Foods"
 no_of_nearest_neighbors = 3
 app = FastAPI()
 
-# Connect to Weaviate
 client = weaviate.connect_to_local(
-    host="localhost",
-    port=8080,
+    host=WEAVIATE_HOST,
+    port=WEAVIATE_PORT,
     grpc_port=50051,
 )
 

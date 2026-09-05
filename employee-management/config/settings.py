@@ -5,8 +5,7 @@ class Settings:
     """Configuration settings for the application"""
     
     # Weaviate Configuration
-    WEAVIATE_URL: str = "http://localhost:8080"
-    # WEAVIATE_URL: str = "http://0.0.0.0:8080"
+    WEAVIATE_URL: str = os.getenv("WEAVIATE_URL", "http://localhost:8080")
     
     # Ollama Embedding Configuration
     NOMIC_API_URL: str = os.getenv("NOMIC_API_URL", "http://localhost:11434/api/embeddings")
@@ -20,14 +19,15 @@ class Settings:
     
     # Embedding Configuration
     EMBEDDING_DIMENSION: int = 768
-    EMBEDDING_MODEL: str = "nomic-embed-text-v1.5"
+    EMBEDDING_MODEL: str = "nomic-embed-text"
 
     # Ollama Configuration
-    REMOTE_OLLAMA_HOST = "localhost"
-    REMOTE_OLLAMA_PORT = 11434
-    MCP_SERVER_PATH = "http://0.0.0.0:8123/sse"
+    REMOTE_OLLAMA_HOST = os.getenv("OLLAMA_HOST", "localhost")
+    REMOTE_OLLAMA_PORT = int(os.getenv("OLLAMA_PORT", "11434"))
+    MCP_SERVER_PATH = os.getenv("MCP_SERVER_URL", "http://localhost:8005/sse")
    
-    # New LLM (Ollama)
-    LLM_URL="http://localhost:11434/v1/chat/completions"
+    # LLM
+    LLM_URL = os.getenv("LLM_URL", "http://localhost:11434/v1/chat/completions")
+
 # Global settings instance
 settings = Settings()

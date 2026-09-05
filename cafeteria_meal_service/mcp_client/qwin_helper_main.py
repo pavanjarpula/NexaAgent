@@ -1,3 +1,4 @@
+import os
 import requests
 from fastapi import FastAPI, HTTPException,Request
 import json
@@ -14,8 +15,10 @@ food_class_name = "Foods"
 user_class  = "EmployeeWallet"
 ordered_foods = "Orders"
 
-mcp_server_url = "http://127.0.0.1:8123/sse"
-quin_url = "http://localhost:11434/v1/chat/completions"
+WEAVIATE_HOST = os.getenv("WEAVIATE_HOST", "localhost")
+WEAVIATE_PORT = int(os.getenv("WEAVIATE_PORT", "8080"))
+mcp_server_url = os.getenv("MCP_SERVER_URL", "http://127.0.0.1:8123/sse")
+quin_url = os.getenv("LLM_URL", "http://localhost:11434/v1/chat/completions")
 mcp = FastAPI()
 mcp.state.user_history =  []
 
@@ -167,8 +170,8 @@ async def text_response(json_response):
         
         for food_id in content["Actioninput"]:
             weaviate_client = weaviate.connect_to_local(
-                host="localhost",
-                port=8080,
+                host=WEAVIATE_HOST,
+                port=WEAVIATE_PORT,
                 grpc_port=50051
             )
             try:
@@ -489,8 +492,8 @@ async def order(request: Request):
         user_id = int(request_data.get("user_id"))
         client = None  # Initialize client variable
         client = weaviate.connect_to_local(
-            host="localhost",
-            port=8080,
+            host=WEAVIATE_HOST,
+            port=WEAVIATE_PORT,
             grpc_port=50051,
         )
         food_uuid = generate_uuid5(food_id)
@@ -547,8 +550,8 @@ async def ordered(request: Request):
         client = None
         try:
             client = weaviate.connect_to_local(
-                host="localhost",
-                port=8080,
+                host=WEAVIATE_HOST,
+                port=WEAVIATE_PORT,
                 grpc_port=50051,
             )
             user_uuid = generate_uuid5(user_id)
