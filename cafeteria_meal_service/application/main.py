@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 WEAVIATE_URL = "http://0.0.0.0:8080"
 CSV_PATH = "indian_restaurants_with_detailed_summaries.csv"
-NOMIC_API_URL = "https://107.110.74.116/workspace_ashish_r1_itchatbot_infrence1/v1/embeddings"
+NOMIC_API_URL = "http://localhost:11434/api/embeddings"
+EMBEDDING_MODEL = "nomic-embed-text"
 # class_name = "DelhiRestaurant"
 # class_name ="IndianRestaurant"
 # class_name = "FoodItems"
@@ -62,18 +63,17 @@ def create_schema():
     return {"status": "Schema created", "class": class_name, "properties": properties}
 async def get_embedding(text: str) -> list[float]:
     headers = {"Content-Type": "application/json"}
-    payload = {"input": [text]}
-    print("hello world")
+    payload = {"model": EMBEDDING_MODEL, "prompt": text}
     
     try:
-        async with httpx.AsyncClient(verify=False) as client:  # Fixed variable name from 'lient' to 'client'
+        async with httpx.AsyncClient(verify=False) as client:
             resp = await client.post(NOMIC_API_URL, headers=headers, json=payload)
             if resp.status_code != 200:
-                logger.error(f"Nomic embedding failed: {resp.text}")
+                logger.error(f"Ollama embedding failed: {resp.text}")
                 raise ValueError(f"Embedding failed with status {resp.status_code}")
             
             data = resp.json()
-            vector = data["data"][0]["embedding"]
+            vector = data["embedding"]
             return vector
     except Exception as e:
         logger.error(f"Error getting embedding: {str(e)}")

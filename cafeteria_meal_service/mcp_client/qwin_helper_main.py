@@ -15,7 +15,7 @@ user_class  = "EmployeeWallet"
 ordered_foods = "Orders"
 
 mcp_server_url = "http://127.0.0.1:8123/sse"
-quin_url = "http://107.110.74.116/workspace_ashish_r1_itchatbot_infrence1/v1/chat/completions"
+quin_url = "http://localhost:11434/v1/chat/completions"
 mcp = FastAPI()
 mcp.state.user_history =  []
 
@@ -167,7 +167,7 @@ async def text_response(json_response):
         
         for food_id in content["Actioninput"]:
             weaviate_client = weaviate.connect_to_local(
-                host="107.109.53.22",
+                host="localhost",
                 port=8080,
                 grpc_port=50051
             )

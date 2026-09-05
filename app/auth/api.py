@@ -7,8 +7,8 @@ import httpx
 class AuthAPI:
     def __init__(self, base_url):
         self.emp_base_url = base_url
-        self.llm_url = "http://107.110.74.116/workspace_ashish_r1_itchatbot_infrence1/v1/chat/completions"
-        self.food_api_url = "http://107.109.53.22:7123/"
+        self.llm_url = "http://localhost:11434/v1/chat/completions"
+        self.food_api_url = "http://localhost:7123/"
     
     def login(self, username, password):
         """Authenticate user with backend"""

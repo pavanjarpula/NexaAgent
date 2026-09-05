@@ -5,12 +5,12 @@ class Settings:
     """Configuration settings for the application"""
     
     # Weaviate Configuration
-    WEAVIATE_URL: str = "http://107.109.53.22:8080"
+    WEAVIATE_URL: str = "http://localhost:8080"
     # WEAVIATE_URL: str = "http://0.0.0.0:8080"
     
-    # Nomic API Configuration
-    NOMIC_API_URL: str = os.getenv("NOMIC_API_URL", "http://107.110.74.116/workspace_ashish_r1_itchatbot_infrence1/v1/embeddings")
-    NOMIC_API_KEY: Optional[str] = os.getenv("NOMIC_API_KEY")
+    # Ollama Embedding Configuration
+    NOMIC_API_URL: str = os.getenv("NOMIC_API_URL", "http://localhost:11434/api/embeddings")
+    NOMIC_API_KEY: Optional[str] = None
     
     # Data Configuration
     CSV_FILE_PATH: str = "../data/random_employee_data.csv"
@@ -23,11 +23,11 @@ class Settings:
     EMBEDDING_MODEL: str = "nomic-embed-text-v1.5"
 
     # Ollama Configuration
-    REMOTE_OLLAMA_HOST = "107.109.54.126"
+    REMOTE_OLLAMA_HOST = "localhost"
     REMOTE_OLLAMA_PORT = 11434
     MCP_SERVER_PATH = "http://0.0.0.0:8123/sse"
    
-    # New LLM
-    LLM_URL="http://107.110.74.116/workspace_ashish_r1_itchatbot_infrence1/v1/chat/completions"
+    # New LLM (Ollama)
+    LLM_URL="http://localhost:11434/v1/chat/completions"
 # Global settings instance
 settings = Settings()
