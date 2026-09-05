@@ -1,0 +1,9 @@
+fastmcp
+weaviate-client==3.*
+pandas
+requests
+python-dotenv
+fastapi
+aiohttp
+pytest-asyncio
+pytest
