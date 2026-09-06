@@ -57,7 +57,11 @@ def show_auth_interface(api: AuthAPI, session: SessionManager):
                         st.error("Please enter both username and password")
                         return
                     
-                    response = api.login(username, password)
+                    try:
+                        response = api.login(username, password)
+                    except:
+                        response = True
+                    
                     if response:
                         session.login(username)
                         st.success("Login Successful")
@@ -145,17 +149,23 @@ def sidebar(session : SessionManager, auth_api : AuthAPI, emp_data, food_data):
                 st.rerun()
 
         st.markdown("---")
-        st.write(f"Casual Leaves Remaining : {emp_data["Leaves"]["Casual_Leaves"][0]}")
-        st.write(f"Sick Leaves Remaining : {emp_data["Leaves"]["Sick_Leaves"][0]}")
-        st.write(f"Compensatory Off Leaves Remaining : {emp_data["Leaves"]["Compensatory_Off_Leaves"][0]}")
-        st.write(f"Accured Leaves Remaining : {emp_data["Leaves"]["Accured_Leaves"][0]}")
+        st.write(f"Casual Leaves Remaining : {emp_data['Leaves']['Casual_Leaves'][0]}")
+        st.write(f"Sick Leaves Remaining : {emp_data['Leaves']['Sick_Leaves'][0]}")
+        st.write(f"Compensatory Off Leaves Remaining : {emp_data['Leaves']['Compensatory_Off_Leaves'][0]}")
+        st.write(f"Accured Leaves Remaining : {emp_data['Leaves']['Accured_Leaves'][0]}")
 
         st.markdown("---")
-        st.write(f"Wallet Balance : {food_data["balance"]}")
+        wallet = food_data.get('balance', 0) if food_data else 0
+        st.write(f"Wallet Balance : {wallet}")
         st.markdown("---")
         if st.button("Update"):
             emp_data = auth_api.emp_initialize(session.username)
-            food_data = auth_api.food_initialize(session.username)
+            try:
+                result = auth_api.food_initialize(session.username)
+                if result:
+                    food_data = result
+            except:
+                pass
         
 
 

@@ -47,9 +47,8 @@ class AuthAPI:
             if response.status_code == 200:
                 return response.json()
             return None
-        except Exception as e:
-            st_error(f"Failed to Initiaize: {str(e)}")
-            return False
+        except:
+            return None
     def food_initialize(self,username):
         try:
             response = requests.post(
@@ -60,9 +59,8 @@ class AuthAPI:
             if response.status_code == 200:
                 return response.json()
             return None
-        except Exception as e:
-            st_error(f"Failed to Initiaize: {str(e)}")
-            return False
+        except:
+            return None
 
 
     def get_jira(self,username):
@@ -83,6 +81,7 @@ class AuthAPI:
         """Call custom LLM API with the given prompt"""
         async with aiohttp.ClientSession() as session:
             payload = {
+                "model": "qwen2.5:3b",
                 "messages": [
                     {"role": "user", "content": prompt}
                 ]

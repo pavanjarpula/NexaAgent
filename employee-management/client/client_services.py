@@ -33,6 +33,7 @@ class CustomLLMMCPClient:
         """Call custom LLM API with the given prompt"""
         async with aiohttp.ClientSession() as session:
             payload = {
+                "model": "qwen2.5:3b",
                 "messages": [
                     {"role": "user", "content": prompt}
                 ]
@@ -43,10 +44,10 @@ class CustomLLMMCPClient:
             async with session.post(self.llm_url, headers=headers, json=payload) as response:
                 if response.status == 200:
                     result = await response.json()
-                    # Adjust according to your LLM's response schema
                     return result.get("choices", [{}])[0].get("message", {}).get("content", "")
                 else:
-                    raise Exception(f"LLM API error: {response.status}")
+                    text = await response.text()
+                    raise Exception(f"LLM API error: {response.status} - {text}")
 
     async def execute_tool_call(self, tool_name: str, parameters: Dict[str, Any]) -> str:
         """Execute a tool call on the MCP server"""

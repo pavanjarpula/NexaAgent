@@ -2,7 +2,7 @@
 
 **Agentic Workplace & Food Assistant**
 
-NexaAgent is an NLP-powered agentic chatbot that unifies workplace management and personalized food discovery within a single conversational interface. It understands natural-language requests, identifies intent, selects the right tools, and executes multi-step actions through an LLM-driven reasoning workflow.
+NexaAgent is an NLP-powered agentic chatbot that unifies workplace management and personalized food discovery within a single conversational interface. It understands natural-language requests, identifies intent, selects the right tools, and executes multi-step actions through an LLM-driven reasoning workflow powered by the Model Context Protocol (MCP).
 
 ---
 
@@ -10,28 +10,27 @@ NexaAgent is an NLP-powered agentic chatbot that unifies workplace management an
 
 ### Workplace Assistant (WorkMate AI)
 - Retrieve employee information and personal details
-- Check employee leave balances
-- Handle leave applications on behalf of the user
-- Generate professional leave-request emails
-- Create and assign Jira tickets
-- Retrieve and track Jira ticket information
-- Update the status of existing Jira tickets
+- Check and manage employee leave balances
+- Apply for leaves via conversational interface
+- Generate professional leave-request emails to managers
+- Create, assign, and track Jira tickets
+- Update Jira ticket statuses
 
 ### Food Assistant (MealMind AI)
 - Recommend restaurants and dishes based on user preferences
-- Semantic search over food and restaurant data
-- Supports queries involving calories, protein, price, ingredients
-- Combines semantic matching with structured/numeric filtering
+- Semantic search over food and restaurant data using vector embeddings
+- Supports queries involving calories, protein, price, and ingredients
+- Combines semantic matching with structured numeric filtering
 - Supports dietary preferences (low-calorie, high-protein, budget-friendly)
 - Location-based restaurant recommendations
 - Place food orders and track order history
 
 ### Agentic Reasoning
-- Analyzes intent and context of user queries
-- Determines which tools are needed
-- Executes multi-step workflows across multiple tools
+- Analyzes intent and context of user queries using LLM reasoning
+- Dynamically selects appropriate tools based on query analysis
+- Executes multi-step workflows across multiple MCP tools
 - Continues reasoning loop until the task is complete
-- Generates natural-language responses from tool outputs
+- Generates natural-language responses from structured tool outputs
 
 ---
 
@@ -75,14 +74,14 @@ NexaAgent is an NLP-powered agentic chatbot that unifies workplace management an
 │              (Vector Database - Port 8080)               │
 │                                                         │
 │  Classes:                                               │
-│  ├── Employee          (profiles + Nomic embeddings)    │
+│  ├── Employee            (profiles + Nomic embeddings)  │
 │  ├── EmployeeLeavesRemaining  (leave balances)          │
-│  ├── LeaveApplication  (leave history)                  │
-│  ├── JiraTicket        (ticket storage)                 │
-│  ├── EmployeeLogin     (bcrypt auth)                    │
-│  ├── Foods             (food items + embeddings)        │
-│  ├── EmployeeWallet    (wallet balances)                │
-│  └── Orders            (food order records)             │
+│  ├── LeaveApplication    (leave history)                │
+│  ├── JiraTicket          (ticket storage)               │
+│  ├── Employeelogin       (bcrypt auth)                  │
+│  ├── Foods               (food items + embeddings)      │
+│  ├── EmployeeWallet      (wallet balances)              │
+│  └── Orders              (food order records)           │
 └─────────────────────────────────────────────────────────┘
           ▲                              ▲
           │                              │
@@ -98,8 +97,8 @@ NexaAgent is an NLP-powered agentic chatbot that unifies workplace management an
                             │                            │
 ┌───────────────────────────┘                            │
 │ OLLAMA (Local)                                         │
-│ - Qwen 2.5 (LLM reasoning)                            │
-│ - Nomic Embed Text (embeddings)                        │
+│ - Qwen 2.5:3B (LLM reasoning + tool selection)        │
+│ - Nomic Embed Text (768-dim embeddings)                │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -109,8 +108,8 @@ NexaAgent is an NLP-powered agentic chatbot that unifies workplace management an
 
 | Component | Technology | Purpose |
 |---|---|---|
-| **LLM** | Qwen 2.5 (via Ollama) | Reasoning, intent analysis, tool selection |
-| **Embeddings** | Nomic Embed Text (via Ollama) | Vector representations for semantic search |
+| **LLM** | Qwen 2.5:3B (via Ollama) | Reasoning, intent analysis, tool selection |
+| **Embeddings** | Nomic Embed Text (via Ollama) | 768-dim vector representations for semantic search |
 | **Vector DB** | Weaviate | Store and query embeddings + structured data |
 | **Agent Protocol** | MCP (Model Context Protocol) | Standardized tool interface between LLM and tools |
 | **Backend** | FastAPI | REST API for employee and food services |
@@ -132,6 +131,7 @@ NexaAgent/
 │   ├── tools/                    # MCP tools (employee, leave, Jira, search)
 │   ├── utils/                    # CSV parsing, validation
 │   ├── scripts/server.py         # MCP Server (port 8005)
+│   ├── scripts/fast_ingest.py    # Quick data ingestion script
 │   ├── client/main.py            # MCP Client + FastAPI (port 5000)
 │   ├── data/                     # Employee CSV data (1000 records)
 │   └── Dockerfile
@@ -153,6 +153,8 @@ NexaAgent/
 ├── docker-compose.yml            # All services orchestration
 ├── nginx.conf                    # Reverse proxy config
 ├── .env.example                  # Environment variables template
+├── start.bat                     # One-click launcher (Windows)
+├── setup-wsl.bat                 # WSL2 setup helper (Windows)
 └── README.md
 ```
 
@@ -163,132 +165,78 @@ NexaAgent/
 - **Docker** + **Docker Compose** - [Install Docker](https://docs.docker.com/get-docker/)
 - **Ollama** - [Install Ollama](https://ollama.com)
 - **Git** - [Install Git](https://git-scm.com/)
+- **Python 3.10+**
 
 ---
 
-## Quick Start (Docker)
+## Quick Start
 
-### 1. Start Ollama on your machine
-
-```bash
-ollama serve
-```
-
-In a separate terminal, pull the required models:
+### 1. Install and start Ollama
 
 ```bash
-ollama pull qwen2.5:7b
+# Install Ollama, then pull models
+ollama pull qwen2.5:3b
 ollama pull nomic-embed-text
-```
 
-### 2. Clone and start services
-
-```bash
-git clone https://github.com/pavanjarpula/NexaAgent.git
-cd NexaAgent
-docker-compose up -d
-```
-
-### 3. Open the application
-
-Navigate to **http://localhost:8501** in your browser.
-
-### 4. Data Ingestion (First Time Only)
-
-After Weaviate is running, ingest the employee data:
-
-```bash
-docker exec -it nexaagent-employee-mcp-server-1 uv run scripts/ingest.py
-```
-
----
-
-## Manual Setup (Without Docker)
-
-### Prerequisites
-
-- Python 3.13 (employee service, frontend)
-- Python 3.10 (food service)
-- Ollama running locally
-- Weaviate running locally
-
-### Step 1: Start Infrastructure
-
-```bash
-# Start Ollama
+# Start Ollama server
 ollama serve
-
-# Start Weaviate
-docker run -d -p 8080:8080 -p 50051:50051 semitechnologies/weaviate:latest
 ```
 
-### Step 2: Employee Management Backend
+### 2. Start Weaviate
+
+```bash
+docker run -d -p 8080:8080 -p 50051:50051 --name weaviate semitechnologies/weaviate:latest
+```
+
+### 3. Install Python dependencies
+
+```bash
+# Employee service
+cd employee-management
+pip install fastmcp fastapi uvicorn bcrypt jira aiohttp pandas python-dotenv requests "weaviate-client==3.26.7"
+
+# Frontend
+cd ../app
+pip install streamlit httpx requests aiohttp python-dotenv
+```
+
+### 4. Ingest data into Weaviate
 
 ```bash
 cd employee-management
-
-# Install dependencies
-uv sync
-
-# Run MCP Server (Terminal 1)
-uv run scripts/server.py
-
-# Run MCP Client (Terminal 2)
-cd client && uv run main.py
+python scripts/fast_ingest.py
 ```
 
-### Step 3: Food Service
+This creates 20 employee records with leave balances and login credentials.
+
+### 5. Start all services
 
 ```bash
-cd cafeteria_meal_service
+# Terminal 1 - MCP Server
+cd employee-management
+python scripts/server.py
 
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-pip install "weaviate-client>=4.0.0" httpx
+# Terminal 2 - Employee Client
+cd employee-management/client
+python main.py
 
-# Run FastAPI App (Terminal 3)
-uvicorn application.main:app --port 8000
-
-# Run MCP Server (Terminal 4)
-python mcp_server/main.py
-
-# Run MCP Client (Terminal 5)
-uvicorn mcp_client.qwin_helper_main:app --port 7123
-```
-
-### Step 4: Frontend
-
-```bash
+# Terminal 3 - Frontend
 cd app
-
-# Install dependencies
-uv sync
-
-# Run Streamlit (Terminal 6)
-uv run streamlit run main.py
+python -m streamlit run main.py --server.port 8501
 ```
 
-### Step 5: Open
+Or on Windows, double-click **`start.bat`**.
 
-Navigate to **http://localhost:8501**
+### 6. Login
 
----
+Navigate to **http://localhost:8501** and login with:
 
-## Environment Variables
-
-All configuration is done via environment variables. See `.env.example` for the full list.
-
-| Variable | Default | Description |
-|---|---|---|
-| `WEAVIATE_URL` | `http://localhost:8080` | Weaviate server URL |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
-| `LLM_URL` | `http://localhost:11434/v1/chat/completions` | LLM API endpoint |
-| `NOMIC_API_URL` | `http://localhost:11434/api/embeddings` | Embedding API endpoint |
-| `EMBEDDING_MODEL` | `nomic-embed-text` | Embedding model name |
-| `BACKEND_BASE_URL` | `http://localhost:5000` | Employee backend URL |
-| `FOOD_API_URL` | `http://localhost:7123/` | Food backend URL |
+| Employee ID | Password |
+|---|---|
+| 101 | demo123 |
+| 102 | demo123 |
+| ... | ... |
+| 120 | demo123 |
 
 ---
 
@@ -297,43 +245,53 @@ All configuration is done via environment variables. See `.env.example` for the 
 ### User Query Flow
 
 1. User types a message in the Streamlit chat interface
-2. The query reaches the FastAPI backend
-3. The LLM (Qwen) analyzes the intent and determines which tools to use
-4. The MCP client invokes the selected tools via MCP protocol
-5. Tool results are returned to the LLM for reasoning
-6. If multiple tools are needed, the loop continues
+2. The frontend sends the query to the FastAPI backend
+3. The LLM (Qwen 2.5) analyzes intent and determines which MCP tools to use
+4. The MCP client invokes the selected tools via MCP SSE protocol
+5. Tool results (from Weaviate) are returned to the LLM for reasoning
+6. If multiple tools are needed, the agentic loop continues
 7. A final natural-language response is generated and displayed
 
-### Semantic Search Flow
+### Agentic Tool Selection
 
-1. User query is converted to a vector embedding using Nomic
-2. Weaviate performs vector similarity search
-3. Results are filtered by structured attributes (price, calories, etc.)
-4. Matching food items are returned and formatted
+The system uses a prompt-engineered reasoning pipeline:
+
+1. **Intent Classification** - LLM determines if the query is employee-related, food-related, or general
+2. **Tool Selection** - Based on intent, the LLM selects the appropriate MCP tool(s)
+3. **Parameter Extraction** - LLM extracts required parameters from the query
+4. **Tool Execution** - MCP client calls the tool, which queries Weaviate
+5. **Response Generation** - LLM synthesizes tool results into a natural response
+
+### Semantic Search (Food)
+
+1. User query is converted to a 768-dim vector embedding using Nomic
+2. Weaviate performs near-vector similarity search
+3. Results are filtered by structured attributes (price, calories, protein)
+4. Matching food items are returned and formatted by the LLM
 
 ### MCP Protocol
 
 The Model Context Protocol (MCP) provides a standardized interface between the LLM and external tools:
 
-- **MCP Server** exposes tools with defined inputs/outputs
-- **MCP Client** discovers and invokes tools
+- **MCP Server** exposes tools with defined input/output schemas
+- **MCP Client** discovers available tools and invokes them
 - **LLM** decides which tools to call based on user intent
 - Tool outputs feed back into the LLM for next-step reasoning
 
 ---
 
-## Docker Services
+## Services
 
 | Service | Port | Description |
 |---|---|---|
-| `weaviate` | 8080, 50051 | Vector database |
-| `employee-mcp-server` | 8005 | Employee MCP tools |
-| `employee-mcp-client` | 5000 | Employee REST API |
-| `food-app` | 8000 | Food search API |
-| `food-mcp-server` | 8123 | Food MCP tools |
-| `food-mcp-client` | 7123 | Food agent API |
-| `frontend` | 8501 | Streamlit UI |
-| `frontend-proxy` | 5000 | Nginx reverse proxy |
+| Weaviate | 8080, 50051 | Vector database |
+| Ollama | 11434 | LLM + Embeddings |
+| Employee MCP Server | 8005 | Employee, Leave, Jira tools |
+| Employee Client | 5000 | Employee REST API |
+| Food App | 8000 | Food search + ingestion |
+| Food MCP Server | 8123 | Food semantic search tools |
+| Food MCP Client | 7123 | Food agent API |
+| Streamlit Frontend | 8501 | User interface |
 
 ---
 
@@ -342,9 +300,10 @@ The Model Context Protocol (MCP) provides a standardized interface between the L
 ### Workplace
 - "How many leaves do I have remaining?"
 - "Apply for leave from Monday to Wednesday"
-- "Draft an email to my manager requesting leave tomorrow"
+- "Draft an email to my manager requesting leave"
 - "Show me my open Jira tickets"
-- "Change the status of my Jira ticket to Done"
+- "What team am I on?"
+- "Who is my manager?"
 
 ### Food
 - "Find me a high-protein meal under 300 rupees"
@@ -352,28 +311,6 @@ The Model Context Protocol (MCP) provides a standardized interface between the L
 - "I want something vegetarian with high protein"
 - "Find a meal containing paneer under 250 rupees"
 - "Show me restaurants nearby with budget-friendly meals"
-
----
-
-## Useful Commands
-
-```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Rebuild after code changes
-docker-compose up -d --build
-
-# View specific service logs
-docker-compose logs -f frontend
-docker-compose logs -f employee-mcp-server
-```
 
 ---
 

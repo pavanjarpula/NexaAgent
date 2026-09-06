@@ -1,6 +1,5 @@
 from streamlit import session_state as st_session
 from datetime import datetime, timedelta
-import weaviate
 
 class SessionManager:
     def __init__(self):
@@ -40,6 +39,9 @@ class SessionManager:
             "username": username,
             "expires_at": datetime.now() + timedelta(days=2) 
         })
+
+    def login_demo(self):
+        self.login("demo_user")
     
     def logout(self):
         st_session.auth.update({

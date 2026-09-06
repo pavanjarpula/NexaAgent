@@ -12,7 +12,7 @@ class Settings:
     NOMIC_API_KEY: Optional[str] = None
     
     # Data Configuration
-    CSV_FILE_PATH: str = "../data/random_employee_data.csv"
+    CSV_FILE_PATH: str = os.getenv("CSV_FILE_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "random_employee_data.csv"))
     
     # Batch Configuration
     BATCH_SIZE: int = int(os.getenv("BATCH_SIZE", "100"))

@@ -10,15 +10,15 @@ class JiraTools:
         self.username = "vaibhavharit040503@gmail.com"
         self.api_token = "ATATT3xFfGF0r6qTTnPzKYoSJNui_-NW0aGue32jePTGd2SiM5kyxtlyM-ytMkkOW4ES1-aUx5MtY8BPhhQGmoPVtg4mcYQc-rxGpnp57OEkGhtMAXSBVBkVLmt4zQcNI59ylDR__etU0CacW4-CN7YrU09UveKW6ATyLtfwCWTfRLfNgp2fVVU=3E557199"
         self.project_key = "ETM"
+        self.jira = None
         try:
             self.jira = JIRA(
                 server=self.server_url,
                 basic_auth=(self.username, self.api_token),
-                timeout=10
+                timeout=5
             )
-        except JIRAError as e:
-            print(f"Failed to connect to Jira: {e.status_code} - {e.text}")
-            raise
+        except Exception as e:
+            print(f"Warning: Jira not available: {e}")
 
 
     def get_employee_jira_tickets(self, emp_id: str, limit: int = 10):

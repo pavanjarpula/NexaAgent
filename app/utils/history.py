@@ -1,27 +1,26 @@
-import shelve
-from streamlit import error as st_error
+import json
+import os
 
 class ChatHistory:
     def __init__(self, username):
         self.username = username
+        self.filepath = os.path.join(os.path.dirname(__file__), f"chat_{username}.json")
     
     def load(self):
-        """Load user's chat history"""
         try:
-            with shelve.open("chat_history") as db:
-                return db.get(f"{self.username}_messages", [])
-        except Exception as e:
-            st_error(f"Error loading chat history: {e}")
+            if os.path.exists(self.filepath):
+                with open(self.filepath, "r") as f:
+                    return json.load(f)
+            return []
+        except:
             return []
     
     def save(self, messages):
-        """Save user's chat history"""
         try:
-            with shelve.open("chat_history") as db:
-                db[f"{self.username}_messages"] = messages
-        except Exception as e:
-            st_error(f"Error saving chat history: {e}")
+            with open(self.filepath, "w") as f:
+                json.dump(messages, f)
+        except:
+            pass
     
     def clear(self):
-        """Clear user's chat history"""
         self.save([])
